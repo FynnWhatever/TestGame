@@ -1,7 +1,8 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using Microsoft.Xna.Framework.Input.Touch;
+using System.Threading;
+using System.Collections.Generic;
 
 namespace TestGame
 {
@@ -12,18 +13,18 @@ namespace TestGame
     {
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
-        Player player;
-        KeyboardState currentKeyboardState;
-        KeyboardState previousKeyboardState;
-        GamePadState currentGamePadState;
-        GamePadState previousGamePadState;
         float playerMoveSpeed;
         Texture2D texture;
+        TCPServer server;
+        private SpriteFont font;
+        Dictionary<string, Player> players;
 
         public Game1()
         {
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
+            server = new TCPServer(1234, this);
+            playerMoveSpeed = 0.01f;
         }
 
         /// <summary>
@@ -34,8 +35,10 @@ namespace TestGame
         /// </summary>
         protected override void Initialize()
         {
+            new Thread(new ThreadStart(server.LoopClients)).Start();
             // TODO: Add your initialization logic here
             base.Initialize();
+            players = new Dictionary<string, Player>();
 
         }
 
@@ -49,8 +52,13 @@ namespace TestGame
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
             texture = Content.Load<Texture2D>("Graphics\\apple");
-
+            font = Content.Load<SpriteFont>("Graphics\\Testfont");
             // TODO: use this.Content to load your game content here
+        }
+
+        internal void DestroyPlayer(string id)
+        {
+            players.Remove(id);
         }
 
         /// <summary>
@@ -73,13 +81,7 @@ namespace TestGame
                 Exit();
             base.Update(gameTime);
 
-            previousGamePadState = currentGamePadState;
-            previousKeyboardState = currentKeyboardState;
-            currentKeyboardState = Keyboard.GetState();
-            currentGamePadState = GamePad.GetState(PlayerIndex.One);
-
-            if(PlayerExists())
-                UpdatePlayer(gameTime);
+            
         }
 
         /// <summary>
@@ -95,52 +97,29 @@ namespace TestGame
             base.Draw(gameTime);
 
             spriteBatch.Begin();
-            if(PlayerExists())
-                player.Draw(spriteBatch);
+            foreach( KeyValuePair<string, Player> pair in players)
+                pair.Value.Draw(spriteBatch);
             spriteBatch.End();
         }
 
-        public void CreatePlayer()
+        public void CreatePlayer(string id)
         {
-            player = new Player();
-            playerMoveSpeed = 8.0f;
+            Player player = new Player();
+            
             Vector2 playerPosition = new Vector2(GraphicsDevice.Viewport.TitleSafeArea.X, GraphicsDevice.Viewport.TitleSafeArea.Y + GraphicsDevice.Viewport.TitleSafeArea.Height / 2);
-            player.Initialize(texture, playerPosition);
+            player.Initialize(id, texture, playerPosition, font);
+            players.Add(id, player);
         }
 
-        private void UpdatePlayer(GameTime gameTime)
+        public void MovePlayer(string id, int x, int y)
         {
-            player.Position.X += currentGamePadState.ThumbSticks.Left.X * playerMoveSpeed;
-            player.Position.Y -= currentGamePadState.ThumbSticks.Left.Y * playerMoveSpeed;
-
-            if (currentKeyboardState.IsKeyDown(Keys.Left) || currentGamePadState.DPad.Left == ButtonState.Pressed)
-            {
-                player.Position.X -= playerMoveSpeed;
-            }
-
-            if (currentKeyboardState.IsKeyDown(Keys.Right) || currentGamePadState.DPad.Right == ButtonState.Pressed)
-            {
-                player.Position.X += playerMoveSpeed;
-            }
-
-            if (currentKeyboardState.IsKeyDown(Keys.Up) || currentGamePadState.DPad.Up == ButtonState.Pressed)
-            {
-                player.Position.Y -= playerMoveSpeed;
-            }
-
-            if (currentKeyboardState.IsKeyDown(Keys.Down) || currentGamePadState.DPad.Down == ButtonState.Pressed)
-            {
-                player.Position.Y += playerMoveSpeed;
-            }
-
-            player.Position.X = MathHelper.Clamp(player.Position.X, 0, GraphicsDevice.Viewport.Width - player.Width);
-            player.Position.Y = MathHelper.Clamp(player.Position.Y, 0, GraphicsDevice.Viewport.Height - player.Height);
+            Player p = players[id];
+            float x_tmp = p.Position.X + x * playerMoveSpeed;
+            float y_tmp = p.Position.Y += y * playerMoveSpeed;
+            p.Position.X = MathHelper.Clamp(x_tmp, 0, GraphicsDevice.Viewport.Width - p.Width);
+            p.Position.Y = MathHelper.Clamp(y_tmp, 0, GraphicsDevice.Viewport.Height - p.Height);
         }
 
-        private bool PlayerExists()
-        {
-            return player != null;
-        }
         
     }
 }

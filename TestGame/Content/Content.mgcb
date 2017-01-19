@@ -25,3 +25,9 @@
 /processorParam:TextureFormat=Color
 /build:Graphics/apple.png
 
+#begin Graphics/Testfont.spritefont
+/importer:FontDescriptionImporter
+/processor:FontDescriptionProcessor
+/processorParam:TextureFormat=Compressed
+/build:Graphics/Testfont.spritefont
+
