@@ -15,15 +15,18 @@ namespace TestGame
         SpriteBatch spriteBatch;
         float playerMoveSpeed;
         Texture2D texture;
-        TCPServer server;
+        TCPServer tcpServer;
+        UDPServer udpServer;
         private SpriteFont font;
         Dictionary<string, Player> players;
+        Vector2 PlayerCounterPosition;
 
         public Game1()
         {
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
-            server = new TCPServer(1234, this);
+            tcpServer = new TCPServer(1234, this);
+            udpServer = new UDPServer(1234, this);
             playerMoveSpeed = 0.01f;
         }
 
@@ -35,10 +38,12 @@ namespace TestGame
         /// </summary>
         protected override void Initialize()
         {
-            new Thread(new ThreadStart(server.LoopClients)).Start();
+            new Thread(new ThreadStart(tcpServer.LoopClients)).Start();
+            new Thread(new ThreadStart(udpServer.LoopClients)).Start();
             // TODO: Add your initialization logic here
             base.Initialize();
             players = new Dictionary<string, Player>();
+            PlayerCounterPosition = new Vector2(10,10);
 
         }
 
@@ -97,9 +102,17 @@ namespace TestGame
             base.Draw(gameTime);
 
             spriteBatch.Begin();
-            foreach( KeyValuePair<string, Player> pair in players)
+            drawPlayerCounter();
+            foreach ( KeyValuePair<string, Player> pair in players)
                 pair.Value.Draw(spriteBatch);
             spriteBatch.End();
+        }
+
+
+        void drawPlayerCounter()
+        {
+            string playerCounterText = "Players connected: " + players.Count;
+            spriteBatch.DrawString(font, playerCounterText, PlayerCounterPosition, Color.Black);
         }
 
         public void CreatePlayer(string id)
@@ -113,7 +126,12 @@ namespace TestGame
 
         public void MovePlayer(string id, int x, int y)
         {
-            Player p = players[id];
+            if (id == null)
+                return;
+            Player p;
+            if (!players.TryGetValue(id, out p))
+                return;
+            
             float x_tmp = p.Position.X + x * playerMoveSpeed;
             float y_tmp = p.Position.Y += y * playerMoveSpeed;
             p.Position.X = MathHelper.Clamp(x_tmp, 0, GraphicsDevice.Viewport.Width - p.Width);

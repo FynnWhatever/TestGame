@@ -6,6 +6,7 @@ using System.Threading;
 using System.Net;
 using System.Web;
 
+
 namespace TestGame
 {
     class TCPServer
@@ -53,11 +54,15 @@ namespace TestGame
             byte[] rcvBytesID = new byte[rcvLenID];
             nStream.Read(rcvBytesID, 0, rcvLenID);
             String id = System.Text.Encoding.ASCII.GetString(rcvBytesID);
+            /*
+            UdpClient receivingUdpClient = receivingUdpClient = new UdpClient(port);
+            receivingUdpClient.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true); //damit der Port von mehreren sockets verwendet werden kann
 
-            ThreadStart starter = delegate { RecieveUDP(id, ip); };
-            Thread thread = new Thread(starter);
-            thread.Start();
-
+            
+            ThreadStart starter = delegate { RecieveUDP(id, ip, receivingUdpClient); };
+            Thread udpThread = new Thread(starter);
+            udpThread.Start();
+            */
             game.CreatePlayer(id);
 
             while (bClientConnected)
@@ -66,7 +71,7 @@ namespace TestGame
                  *Do some TCP HANDLING here 
                 */
 
-                /*
+                
                 byte[] rcvLenBytes = new byte[4];
                 nStream.Read(rcvLenBytes,0,4);
                 
@@ -79,25 +84,20 @@ namespace TestGame
                 String rcv = System.Text.Encoding.ASCII.GetString(rcvBytes);
                 if (rcv.Equals(""))
                     break;
-                PlayerInput input = new System.Web.Script.Serialization.JavaScriptSerializer().Deserialize<PlayerInput>(rcv);
-                if (input == null)
-                    break;
-                
-
-                game.MovePlayer(id,input.x,input.y);
-                input = null;
-
-                */
-
+           
             }
-            game.DestroyPlayer(id);
+            /*
+            receivingUdpClient.Close();
+            udpThread.Abort();
+            */
             nStream.Close();
             client.Close();
+            game.DestroyPlayer(id);
         }
 
-        void RecieveUDP(string id, string ip)
+        /*
+        void RecieveUDP(string id, string ip, UdpClient receivingUdpClient )
         {
-            UdpClient receivingUdpClient = new UdpClient(port);
             IPAddress udpAddress = IPAddress.Parse(ip);
             IPEndPoint RemoteIpEndPoint = new IPEndPoint(udpAddress, port);
 
@@ -105,11 +105,21 @@ namespace TestGame
 
             while (bClientConnected)
             {
-                Byte[] rcvBytes = receivingUdpClient.Receive(ref RemoteIpEndPoint);
-                String rcv = System.Text.Encoding.ASCII.GetString(rcvBytes);
-                if (rcv.Equals(""))
-                    break;
-                PlayerInput input = new System.Web.Script.Serialization.JavaScriptSerializer().Deserialize<PlayerInput>(rcv);
+                PlayerInput input = null;
+                try
+                {
+                    Byte[] rcvBytes = receivingUdpClient.Receive(ref RemoteIpEndPoint);
+                    if (rcvBytes == null || rcvBytes.Length == 0) // socket was closed?
+                        return;
+                    String rcv = System.Text.Encoding.ASCII.GetString(rcvBytes);
+                    if (rcv.Equals(""))
+                        break;
+                    input = new System.Web.Script.Serialization.JavaScriptSerializer().Deserialize<PlayerInput>(rcv);
+                }
+                catch (ThreadAbortException)
+                {
+                }
+               
                 if (input == null)
                     break;
 
@@ -117,5 +127,7 @@ namespace TestGame
                 input = null;
             }
         }
+        */
     }
+
 }
