@@ -9,6 +9,7 @@ namespace TestGame
     class PlayerInput
     {
         public string id { get; set; }
+        public Game1.PlayerAction action { get; set; }
         public int x { get; set; }
         public int y { get; set; }
     }

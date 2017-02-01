@@ -20,6 +20,7 @@ namespace TestGame
         private SpriteFont font;
         Dictionary<string, Player> players;
         Vector2 PlayerCounterPosition;
+        public enum PlayerAction{move,pressA,pressB};
 
         public Game1()
         {
@@ -124,18 +125,34 @@ namespace TestGame
             players.Add(id, player);
         }
 
-        public void MovePlayer(string id, int x, int y)
+        public void MovePlayer(string id, PlayerAction action, int x, int y)
         {
             if (id == null)
                 return;
             Player p;
             if (!players.TryGetValue(id, out p))
                 return;
-            
-            float x_tmp = p.Position.X + x * playerMoveSpeed;
-            float y_tmp = p.Position.Y += y * playerMoveSpeed;
-            p.Position.X = MathHelper.Clamp(x_tmp, 0, GraphicsDevice.Viewport.Width - p.Width);
-            p.Position.Y = MathHelper.Clamp(y_tmp, 0, GraphicsDevice.Viewport.Height - p.Height);
+
+            switch (action) {
+                case PlayerAction.move:
+                {                    
+                    float x_tmp = p.Position.X + x * playerMoveSpeed;
+                    float y_tmp = p.Position.Y += y * playerMoveSpeed;
+                    p.Position.X = MathHelper.Clamp(x_tmp, 0, GraphicsDevice.Viewport.Width - p.Width);
+                    p.Position.Y = MathHelper.Clamp(y_tmp, 0, GraphicsDevice.Viewport.Height - p.Height);
+                    break;
+                }
+                case PlayerAction.pressA:
+                {
+                    //do smth
+                    break;
+                }
+                case PlayerAction.pressB:
+                {
+                    //do smth
+                    break;
+                }
+            }
         }
 
         

@@ -12,6 +12,7 @@ namespace TestGame
 
     {
         public string ID;
+        public string buttonInput = "";
         public Texture2D PlayerTexture;
         public Vector2 Position;
         private SpriteFont PlayerFont;
@@ -44,7 +45,8 @@ namespace TestGame
         public void Draw(SpriteBatch spriteBatch)
         {
             spriteBatch.Draw(PlayerTexture, Position, null, Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
-            spriteBatch.DrawString(PlayerFont, ID, Position, Color.Blue);
+            string outy = ID + ": " + buttonInput;
+            spriteBatch.DrawString(PlayerFont, outy, Position, Color.Blue);
         }
     }
 
