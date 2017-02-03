@@ -28,7 +28,7 @@ namespace TestGame
             Content.RootDirectory = "Content";
             tcpServer = new TCPServer(1234, this);
             udpServer = new UDPServer(1234, this);
-            playerMoveSpeed = 0.01f;
+            playerMoveSpeed = 0.02f;
         }
 
         /// <summary>

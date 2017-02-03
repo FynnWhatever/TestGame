@@ -19,7 +19,7 @@ namespace TestGame
         public UDPServer(int port, Game1 g1)
         {
             game = g1;
-            receivingUdpClient = receivingUdpClient = new UdpClient(port);
+            receivingUdpClient = new UdpClient(port);
             RemoteIpEndPoint = new IPEndPoint(IPAddress.Any, port);
             _isRunning = true;
             this.port = port;
