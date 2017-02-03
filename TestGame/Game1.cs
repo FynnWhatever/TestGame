@@ -144,13 +144,15 @@ namespace TestGame
                 }
                 case PlayerAction.pressA:
                 {
-                    //do smth
+                        //do smth
+                        p.buttonInput = "A";
                     break;
                 }
                 case PlayerAction.pressB:
                 {
-                    //do smth
-                    break;
+                        //do smth
+                        p.buttonInput = "B";
+                        break;
                 }
             }
         }

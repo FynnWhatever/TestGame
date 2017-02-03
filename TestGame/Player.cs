@@ -8,6 +8,14 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace TestGame
 {
+
+    interface IBasicPlayer
+    {
+        string ID { get; set; }
+        Vector2 Position { get; set; }
+        void Draw(SpriteBatch spriteBatch);
+    }
+
     class Player
 
     {
