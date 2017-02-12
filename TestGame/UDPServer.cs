@@ -48,7 +48,8 @@ namespace TestGame
             if (input == null)
                 return;
 
-            game.MovePlayer(input.id, input.action, input.x, input.y);
+            game.UpdatePlayer(input);
+			
         }
     }
 }

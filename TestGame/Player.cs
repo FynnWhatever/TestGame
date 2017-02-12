@@ -20,29 +20,12 @@ namespace TestGame
 
     {
         public string ID;
-        public string buttonInput = "";
-        public Texture2D PlayerTexture;
-        public Vector2 Position;
-        private SpriteFont PlayerFont;
-        public bool Active;
-        public int Health;
-        public int Width
-        {
-            get { return PlayerTexture.Width; }
-        }
-        public int Height
-        {
-            get { return PlayerTexture.Height; }
-        }
+		public Input Input;
 
-        public void Initialize(string uniqueID,Texture2D texture, Vector2 position, SpriteFont font)
+        public Player(string uniqueID)
         {
-            PlayerTexture = texture;
-            Position = position;
-            Active = true;
-            Health = 100;
             ID = uniqueID;
-            PlayerFont = font;
+			Input = new Input();
         }
 
         public void Update()
@@ -52,9 +35,7 @@ namespace TestGame
 
         public void Draw(SpriteBatch spriteBatch)
         {
-            spriteBatch.Draw(PlayerTexture, Position, null, Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
-            string outy = ID + ": " + buttonInput;
-            spriteBatch.DrawString(PlayerFont, outy, Position, Color.Blue);
+
         }
     }
 

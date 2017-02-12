@@ -13,14 +13,11 @@ namespace TestGame
     {
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
-        float playerMoveSpeed;
-        Texture2D texture;
         TCPServer tcpServer;
         UDPServer udpServer;
         private SpriteFont font;
         Dictionary<string, Player> players;
         Vector2 PlayerCounterPosition;
-        public enum PlayerAction{move,pressA,pressB};
 
         public Game1()
         {
@@ -28,7 +25,6 @@ namespace TestGame
             Content.RootDirectory = "Content";
             tcpServer = new TCPServer(1234, this);
             udpServer = new UDPServer(1234, this);
-            playerMoveSpeed = 0.02f;
         }
 
         /// <summary>
@@ -57,8 +53,7 @@ namespace TestGame
             base.LoadContent();
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
-            texture = Content.Load<Texture2D>("Graphics\\apple");
-            font = Content.Load<SpriteFont>("Graphics\\Testfont");
+            font = Content.Load<SpriteFont>("Graphics/Testfont");
             // TODO: use this.Content to load your game content here
         }
 
@@ -104,8 +99,6 @@ namespace TestGame
 
             spriteBatch.Begin();
             drawPlayerCounter();
-            foreach ( KeyValuePair<string, Player> pair in players)
-                pair.Value.Draw(spriteBatch);
             spriteBatch.End();
         }
 
@@ -118,45 +111,46 @@ namespace TestGame
 
         public void CreatePlayer(string id)
         {
-            Player player = new Player();
-            
-            Vector2 playerPosition = new Vector2(GraphicsDevice.Viewport.TitleSafeArea.X, GraphicsDevice.Viewport.TitleSafeArea.Y + GraphicsDevice.Viewport.TitleSafeArea.Height / 2);
-            player.Initialize(id, texture, playerPosition, font);
+			Player player = new Player(id);
             players.Add(id, player);
         }
 
-        public void MovePlayer(string id, PlayerAction action, int x, int y)
+        public void UpdatePlayer(PlayerInput input)
         {
-            if (id == null)
+            if (input == null)
                 return;
             Player p;
-            if (!players.TryGetValue(id, out p))
+            if (!players.TryGetValue(input.id, out p))
                 return;
+			p.Input.ReceiveInputs(input);
 
-            switch (action) {
-                case PlayerAction.move:
-                {                    
-                    float x_tmp = p.Position.X + x * playerMoveSpeed;
-                    float y_tmp = p.Position.Y += y * playerMoveSpeed;
-                    p.Position.X = MathHelper.Clamp(x_tmp, 0, GraphicsDevice.Viewport.Width - p.Width);
-                    p.Position.Y = MathHelper.Clamp(y_tmp, 0, GraphicsDevice.Viewport.Height - p.Height);
-                    break;
-                }
-                case PlayerAction.pressA:
-                {
-                        //do smth
-                        p.buttonInput = "A";
-                    break;
-                }
-                case PlayerAction.pressB:
-                {
-                        //do smth
-                        p.buttonInput = "B";
-                        break;
-                }
-            }
-        }
+			/*
+		switch (action) {
+			case PlayerAction.move:
+			{                    
+				float x_tmp = p.Position.X + x * playerMoveSpeed;
+				float y_tmp = p.Position.Y += y * playerMoveSpeed;
+				p.Position.X = MathHelper.Clamp(x_tmp, 0, GraphicsDevice.Viewport.Width - p.Width);
+				p.Position.Y = MathHelper.Clamp(y_tmp, 0, GraphicsDevice.Viewport.Height - p.Height);
+				break;
+			}
+			case PlayerAction.pressA:
+			{
+					//do smth
+					p.buttonInput = "A";
+				break;
+			}
+			case PlayerAction.pressB:
+			{
+					//do smth
+					p.buttonInput = "B";
+					break;
+			}
 
-        
-    }
+		}
+		*/
+		}
+
+
+	}
 }

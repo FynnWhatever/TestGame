@@ -6,11 +6,13 @@ using System.Threading.Tasks;
 
 namespace TestGame
 {
-    class PlayerInput
+    public class PlayerInput
     {
         public string id { get; set; }
-        public Game1.PlayerAction action { get; set; }
-        public int x { get; set; }
-        public int y { get; set; }
+		public bool btnA { get; set; }
+		public bool btnB { get; set; }
+		public bool btnStick { get; set; }
+		public float stickX { get; set; }
+        public float stickY { get; set; }
     }
 }
